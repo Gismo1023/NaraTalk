@@ -1,0 +1,14 @@
+# PyCharm
+.idea/
+*.iml
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+# 환경변수
+.env
+.env.*
+!.env.example
+# 오디파일
+.wav
