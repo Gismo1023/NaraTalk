@@ -10,5 +10,5 @@ venv/
 .env
 .env.*
 !.env.example
-# 오디파일
-.wav
+# 오디파일 추가안함
+*.wav
