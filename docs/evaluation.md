@@ -83,7 +83,7 @@ $$\text{발음 점수(Score)} = \max(0.0, \text{Round}(Raw\_Score, 1))$$
 ```json
 {
   "reference_text": "역삼역으로 가는 지하철이 어느 방향인가요?",
-  "transcript": "역삼역으로는 가는 지하찰다 어 방향인가오",
+  "transcript": "역삼역으로는 가는 지하찰다 어 방향인가오??",
   "normalized_reference": "역삼역으로 가는 지하철이 어느 방향인가요",
   "normalized_transcript": "역삼역으로는 가는 지하찰다 어 방향인가오",
   "level": "어려움",
@@ -97,6 +97,8 @@ $$\text{발음 점수(Score)} = \max(0.0, \text{Round}(Raw\_Score, 1))$$
   "score": 75.0,
   "grade": "양호한 수준",
   "feedback": "👍 좋아요! 의사소통에 문제없지만 일부 음절을 더 명확히 해보세요.",
+  "latency_ms": 350,
+  "created_at": "2026-10-23T10:06:48.782728",
   "display": {
     "cer_percent": "27.8%",
     "wer_percent": "80.0%",
