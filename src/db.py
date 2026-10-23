@@ -7,17 +7,17 @@ from psycopg.rows import dict_row
 from psycopg.errors import UniqueViolation, ForeignKeyViolation
 from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent  # src_db 폴더
+BASE_DIR = Path(__file__).resolve().parent  # src 폴더
 PROJECT_DIR = BASE_DIR.parent  # NaraTalk 프로젝트 루트
 SQL_DIR = PROJECT_DIR / 'sql_schema_sql'  # 팀장이 만든 SQL 폴더
-load_dotenv(PROJECT_DIR / '.env')  # 팀 프로젝트 루트의 .env 읽기
+load_dotenv(BASE_DIR / '.env')  # src 폴더의 .env 읽기
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 # PostgreSQL 연결
 def get_connection():
     if not DATABASE_URL:
-        raise ValueError('NaraTalk/.env 파일에 DATABASE_URL을 설정하세요.')
+        raise ValueError('NaraTalk/src/.env 파일에 DATABASE_URL을 설정하세요.')
     return psycopg.connect(DATABASE_URL, row_factory=dict_row)
 
 
