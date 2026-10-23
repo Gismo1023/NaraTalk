@@ -5,7 +5,6 @@ from jiwer import cer, wer, process_characters
 
 # 평가(지표 계산)를 위해 구두점 제거 및 영문 소문자 통일만 수행
 def clean_for_evaluation(text: str) -> str:
-
     if not text:
         return ""
 
@@ -24,6 +23,7 @@ def calculate_wer(reference: str, hypothesis: str) -> float:
 
     result = wer(reference, hypothesis)
     return round(float(result), 4)
+
 
 # Levenshtein 정렬·오류 유형 표시
 # CER 계산 (S, D, I 정밀 측정)
@@ -130,16 +130,13 @@ def evaluate_pronunciation(reference_text: str, hypothesis_text: str, level: str
 # STT 추론 및 시간 측정 클래스
 try:
     from faster_whisper import WhisperModel
-
     HAS_FASTER_WHISPER = True
 except ImportError:
     HAS_FASTER_WHISPER = False
 
 
 class PronunciationPipeline:
-    # STT 추론 모듈(faster-whisper) 초기화
     def __init__(self, model_size: str = "base", device: str = "cpu", compute_type: str = "int8"):
-
         if not HAS_FASTER_WHISPER:
             raise ImportError("faster-whisper 라이브러리가 설치되어 있지 않습니다.")
 
@@ -147,52 +144,115 @@ class PronunciationPipeline:
         self.stt_model = WhisperModel(model_size, device=device, compute_type=compute_type)
         print("STT 모델 로드 완료!")
 
-    # 음성 파일(.wav) 경로를 받아 STT 전사를 수행하고, 소요 시간(밀리초)을 측정
     def run_stt_with_latency(self, audio_file_path: str) -> tuple[str, int]:
-
         print(f"음성 파일({audio_file_path}) STT 추론 중...")
-
-        start_time = time.time()  # 추론 시작 시간 기록
+        start_time = time.time()
 
         segments, info = self.stt_model.transcribe(audio_file_path, language="ko")
         transcript = " ".join([segment.text for segment in segments]).strip()
 
-        end_time = time.time()  # 추론 종료 시간 기록
-        latency_ms = int((end_time - start_time) * 1000)  # 밀리초(ms) 단위 환산
+        end_time = time.time()
+        latency_ms = int((end_time - start_time) * 1000)
 
         print(f"STT 전사 완료: '{transcript}' (소요 시간: {latency_ms}ms)")
         return transcript, latency_ms
 
-    # 전체 파이프라인 실행: 음성 파일 STT 추론 + 시간 측정 + CER/WER 평가 리포트 산출
     def evaluate(self, audio_file_path: str, reference_text: str, level: str = "보통") -> dict:
-
-        # STT 추론 및 처리 시간 측정
         hypothesis_text, latency_ms = self.run_stt_with_latency(audio_file_path)
-
-        # 평가 모듈 호출 및 결과 반환 (측정된 latency_ms 자동 주입)
         evaluation_result = evaluate_pronunciation(
             reference_text=reference_text,
             hypothesis_text=hypothesis_text,
             level=level,
             latency_ms=latency_ms
         )
-
         return evaluation_result
 
 
-# --- 테스트 예시 실행 ---
+# --- DB 연동 통합 테스트 실행부 ---
 if __name__ == "__main__":
-    target_reference = "역삼역으로 가는 지하철이 어느 방향인가요?"
-    hyp = "역삼역으로는 가는 지하찰다 어 방향인가오??"
-
-    # 텍스트 단독 평가 테스트 (latency_ms 수동 지정 가능)
-    res = evaluate_pronunciation(target_reference, hyp, level="어려움", latency_ms=350)
     import json
+    import sys
+    from pathlib import Path
 
-    print("=== [텍스트 단독 평가 테스트 결과] ===")
-    print(json.dumps(res, ensure_ascii=False, indent=2))
+    # src_db 폴더를 파이썬 경로에 추가하여 db.py를 원활하게 임포트하도록 설정
+    current_dir = Path(__file__).resolve().parent
+    project_root = current_dir.parent
+    sys.path.append(str(project_root / "src_db"))
 
-    # 파이프라인 클래스를 통한 실제 음성/STT 연동 테스트 시나리오
-    # pipeline = PronunciationPipeline(model_size="base")
-    # final_report = pipeline.evaluate("sample_recording.wav", target_reference, level="보통")
-    # print(json.dumps(final_report, ensure_ascii=False, indent=2))
+    try:
+        from db import initialize_database, register_user, login_user, get_sentence, save_practice_run, get_practice_history
+    except ImportError as e:
+        print(f"⚠️ DB 모듈 임포트 실패: {e}")
+        print("src_db 폴더와 db.py 파일 위치를 확인해주세요.")
+        sys.exit(1)
+
+    print("=" * 60)
+    print("🚀 발음 평가 엔진 & 데이터베이스(DB) 연동 테스트 시작")
+    print("=" * 60)
+
+    # 1. DB 초기화 (테이블이 없다면 생성)
+    try:
+        initialize_database()
+    except Exception as e:
+        print(f"⚠️ DB 초기화 스킵 또는 연결 확인 필요: {e}")
+
+    # 2. 테스트용 회원 등록 (또는 기존 회원 조회)
+    try:
+        user = register_user("테스트수강생")
+        user_id = user["id"]
+        print(f"✅ 테스트 회원 준비 완료 (UUID: {user_id})")
+    except Exception as e:
+        user = login_user("테스트수강생")
+        if user:
+            user_id = user["id"]
+            print(f"✅ 기존 테스트 회원으로 진행 (UUID: {user_id})")
+        else:
+            raise e
+
+    # 3. 테스트용 문장 가져오기 (예: 1번 문장)
+    sentence = get_sentence(sentence_no=16)
+    if not sentence:
+        raise ValueError("DB에 등록된 문장이 없습니다. seed_sentences_34.sql이 실행되었는지 확인하세요.")
+
+    sentence_id = sentence["id"]
+    target_reference = sentence["ko"]
+    print(f"📖 타겟 문장 로드 성공: '{target_reference}' (ID: {sentence_id})")
+
+    # 4. 사용자가 발음한 가상의 STT 텍스트 (조금 틀린 상태)
+    mock_transcript = "부대이 시설이 어디 있야요!"
+
+    # 5. evaluation.py의 평가 엔진 가동 (CER, WER, 점수, 피드백 및 latency_ms 산출)
+    report = evaluate_pronunciation(
+        reference_text=target_reference,
+        hypothesis_text=mock_transcript,
+        level=sentence["level"],
+        latency_ms=450  # 가상의 STT 처리 시간 (450ms)
+    )
+
+    print("\n📊 [평가 엔진 산출 리포트]")
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+
+    # 6. 산출된 리포트를 db.py를 통해 practice_runs 테이블에 저장!
+    run_id = save_practice_run(
+        user_id=user_id,
+        sentence_id=sentence_id,
+        transcript=report["transcript"],
+        wer=report["wer"],
+        cer=report["cer"],
+        latency_ms=report["latency_ms"],
+        score=report["score"],
+        grade=report["grade"],
+        feedback=report["feedback"],
+        substitutions=report["cer_details"]["substitutions"],
+        deletions=report["cer_details"]["deletions"],
+        insertions=report["cer_details"]["insertions"]
+    )
+
+    print(f"\n🎉 [DB 저장 성공!] 생성된 practice_runs ID: {run_id}")
+
+    # 7. DB에서 방금 저장한 내역이 잘 조회되는지 확인
+    history = get_practice_history(user_id)
+    print(f"\n📂 [DB 조회 결과] 해당 회원의 총 연습 기록 수: {len(history)}건")
+    if history:
+        print(f"가장 최근 기록 요약 -> 점수: {history[0]['score']}점, 등급: {history[0]['grade']}, 인식문장: '{history[0]['transcript']}'")
+    print("=" * 60)
