@@ -125,7 +125,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print("=" * 60)
-    print("🚀 evaluation.py 단독 평가 & DB 연동 테스트 시작")
+    print("🚀 core.py 단독 평가 & DB 연동 테스트 시작")
     print("=" * 60)
 
     try:

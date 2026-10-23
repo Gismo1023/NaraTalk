@@ -1,5 +1,5 @@
 import time
-from evaluation import evaluate_pronunciation
+from core import evaluate_pronunciation
 
 try:
     from faster_whisper import WhisperModel
