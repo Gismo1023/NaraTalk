@@ -134,13 +134,20 @@ def get_sentences_grouped():
     return grouped
 
 
-# STT 연습 결과 저장. status는 True(합격) 또는 False(불합격)
+# STT 연습 결과 저장
 def save_practice_run(user_id, sentence_id, transcript,
-                      wer, cer, latency_ms, status):
-    if type(status) is not bool:
-        raise ValueError('status는 True(합격) 또는 False(불합격)여야 합니다.')
+                      wer, cer, latency_ms, score, grade,
+                      feedback, substitutions, deletions, insertions):
 
-    params = (user_id, sentence_id, transcript, wer, cer, latency_ms, status)
+    if grade not in ('매우 우수', '양호한 수준', '기초에 집중'):
+        raise ValueError('grade는 매우 우수, 양호한 수준, 기초에 집중 중 하나여야 합니다.')
+
+    params = (
+        user_id, sentence_id, transcript,
+        wer, cer, latency_ms, score, grade,
+        feedback, substitutions, deletions, insertions
+    )
+
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(load_sql('save_practice_run.sql'), params)

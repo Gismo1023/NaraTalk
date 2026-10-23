@@ -7,7 +7,12 @@ CREATE TABLE IF NOT EXISTS practice_runs (
     wer DOUBLE PRECISION, -- 단어 오류율
     cer DOUBLE PRECISION, -- 문자 오류율
     latency_ms INTEGER, -- 처리시간(ms)
-    status BOOLEAN NOT NULL, -- TRUE=합격, FALSE=불합격 (판정 기준은 평가 기능에서 결정)
+    score DOUBLE PRECISION,
+    grade TEXT CHECK (grade IN ('매우 우수', '양호한 수준', '기초에 집중')),
+    feedback TEXT,
+    substitutions INTEGER CHECK (substitutions >= 0),
+    deletions INTEGER CHECK (deletions >= 0),
+    insertions INTEGER CHECK (insertions >= 0),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now() -- 연습 날짜 및 시간
 );
 
