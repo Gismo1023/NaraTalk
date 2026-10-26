@@ -1,4 +1,6 @@
 [theme]
 base = "light"
-primaryColor = "#2C45A8"
+primaryColor = "#2C45A8"              # 버튼·체크박스: 포스터 밤하늘 파랑
+backgroundColor = "#F7F2E6"           # 본문 배경: 한지 톤
+secondaryBackgroundColor = "#EFE6D2"  # 사이드바·입력창 배경: 짙은 한지 톤
 textColor = "#2B2B2B"
