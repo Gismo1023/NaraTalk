@@ -13,6 +13,21 @@ from dotenv import load_dotenv
 APP_DIR = Path(__file__).resolve().parent      # NaraTalk/app
 PROJECT_DIR = APP_DIR.parent                   # NaraTalk
 
+# 서비스 이름: 훈민정음 옛한글 표기 (ㅆ + 아래아 ᆞ)
+#   "\u110A" = 초성 ㅆ, "\u119E" = 아래아(ㆍ)
+TITLE_TEXT = "나랏말\u110A\u119E미"
+
+# 이미지 폴더: app/assets 를 먼저 찾고, 없으면 프로젝트 루트의 assets
+ASSETS_DIR = next(
+    (d for d in (APP_DIR / "assets", PROJECT_DIR / "assets") if d.exists()),
+    APP_DIR / "assets",
+)
+
+# 사이드바 맨 아래 저작권 표시
+FOOTER_ICON = ASSETS_DIR / "footer_icon.png"
+FOOTER_ICON_WIDTH = 36         # ← 아이콘 크기(픽셀). 글자 높이와 비슷하게
+FOOTER_TEXT = "Copyright © jiphyeonjeon Corp. All Rights Reserved."
+
 for path in (APP_DIR, PROJECT_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
@@ -25,7 +40,7 @@ load_dotenv(PROJECT_DIR / "src" / ".env", override=True)
 #    색상은 .streamlit/config.toml 의 [theme] 으로 지정
 # ==========================================================
 st.set_page_config(
-    page_title="나랏말싸미",
+    page_title=TITLE_TEXT,
     page_icon="🇰🇷",
     layout="wide",
 )
@@ -94,7 +109,9 @@ def logout():
 
 def show_sidebar():
     with st.sidebar:
-        st.title("🇰🇷 나랏말싸미")
+        # 타이틀: 글자로 표시 (나랏말ᄊᆞ미)
+        st.title(TITLE_TEXT)
+
         if st.session_state.user_name:
             st.caption(f"👤 {st.session_state.user_name}님")
         st.divider()
@@ -112,7 +129,23 @@ def show_sidebar():
 
         st.divider()
         st.button("처음 화면으로", use_container_width=True, on_click=logout)
-        st.caption("집현전 해요")
+
+        show_footer()
+
+
+def show_footer():
+    """사이드바 맨 아래: 작은 한옥 아이콘 + 저작권 문구."""
+    st.divider()
+    try:
+        icon_col, text_col = st.columns([1, 5], vertical_alignment="center")  # 1.36 이상
+    except TypeError:
+        icon_col, text_col = st.columns([1, 5])                                # 1.36 미만
+
+    with icon_col:
+        if FOOTER_ICON.exists():
+            st.image(str(FOOTER_ICON), width=FOOTER_ICON_WIDTH)
+    with text_col:
+        st.caption(FOOTER_TEXT)
 
 
 # ==========================================================

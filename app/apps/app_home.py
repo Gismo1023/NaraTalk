@@ -17,6 +17,10 @@ _ASSETS_DIR = next(
 )
 HERO_IMAGE = _ASSETS_DIR / "start_hero.jpg"
 
+# 서비스 이름: 훈민정음 옛한글 표기 (ㅆ + 아래아 ᆞ)
+#   "\u110A" = 초성 ㅆ, "\u119E" = 아래아(ㆍ)
+TITLE_TEXT = "나랏말\u110A\u119E미"
+
 
 # ==========================================================
 # 동의 문구 (예시 — 실제 문구로 교체해 사용)
@@ -56,6 +60,30 @@ def _show_image(path: Path):
         st.image(str(path), use_column_width=True)          # 1.40 미만
 
 
+def _enter_app():
+    """시작하기: 이름·동의를 저장하고 홈으로 이동."""
+    name = st.session_state.get("start_name", "").strip()
+    if not name or not st.session_state.get("start_agreed", False):
+        return                      # 이름 또는 동의가 없으면 시작하지 않음
+
+    st.session_state.user_name = name
+    st.session_state.consent_agreed = True
+    # TODO: DB 연동 시 사용자 조회/생성 후 user_id·동의 일시 저장
+    st.session_state.user_id = None
+    st.session_state.entered = True
+    st.session_state.page = "홈"
+
+
+def _space_cm(cm: float):
+    """CSS 없이 세로 간격 만들기: 높이를 지정한 빈 컨테이너를 끼워 넣음.
+
+    1cm ≈ 37.8px. Streamlit이 요소 사이에 기본으로 두는 간격(위·아래 약 16px씩)을
+    빼서, 앞 요소와 다음 요소 사이가 지정한 cm가 되도록 맞춤.
+    """
+    px = round(cm * 37.8) - 32
+    st.container(height=max(px, 1), border=False)
+
+
 # ==========================================================
 # 시작 페이지 (이름 입력 전)
 #   왼쪽: 포스터 / 오른쪽: 부제 → 동의 → 체크 → 이름 → 시작하기
@@ -68,16 +96,18 @@ def page_start():
         if HERO_IMAGE.exists():
             _show_image(HERO_IMAGE)
         else:
-            st.title("나랏말싸미")
+            st.title(TITLE_TEXT)
 
     # ── 오른쪽: 입력 영역 ──
     with right:
-        for _ in range(6):          # 포스터 가운데 높이에 맞추기 위한 빈 줄
-            st.write("")
+        # 제목: 빈 줄 없이 시작 → 포스터 맨 윗부분과 높이를 맞춤
+        st.title(TITLE_TEXT)
 
-        st.title("나랏말싸미")
-        st.subheader("듣고, 따라 말하고, 바로 교정받는 AI 한국어 발음 코치")
-        st.write("")
+        # 부제: 굵지 않은 보통 글씨
+        st.write("듣고, 따라 말하고, 바로 교정받는 AI 한국어 발음 코치")
+
+        # 부제와 동의 문구 사이 3cm
+        _space_cm(3)
 
         # ① 동의 문구: 클릭하면 아래로 펼쳐짐
         #    '동의합니다'를 체크하면 제목이 바뀌면서 새로 그려져 자동으로 닫힘
@@ -89,36 +119,55 @@ def page_start():
         # ② 동의 체크박스
         agreed = st.checkbox("동의합니다", key="start_agreed")
 
-        # ③ 이름 입력
-        name = st.text_input(
-            "이름",
-            value=st.session_state.user_name,
-            placeholder="이름 또는 닉네임을 입력해 주세요",
-            max_chars=20,
-            label_visibility="collapsed",
-            key="start_name",
-        )
+        # 체크박스와 이름 입력 사이 3cm
+        _space_cm(3)
 
-        # ④ 이름 입력 + 동의 체크가 모두 되어야 시작하기 활성화
-        can_start = bool(name.strip()) and agreed
+        # ③ 이름 입력 + ④ 시작하기 (form: 입력창에서 Enter를 누를 때마다 제출됨)
+        #   1번째 Enter(또는 클릭): 이름 확정 → 시작하기 버튼이 파란색으로 바뀜
+        #   2번째 Enter(또는 클릭): 다음 화면(홈)으로 이동
+        if not agreed:
+            st.session_state.start_ready = False      # 동의를 풀면 다시 회색으로
 
-        if st.button(
-            "시작하기",
-            type="primary",
-            use_container_width=True,
-            disabled=not can_start,
-            key="start_button",
-        ):
-            st.session_state.user_name = name.strip()
-            st.session_state.consent_agreed = True
-            # TODO: DB 연동 시 사용자 조회/생성 후 user_id·동의 일시 저장
-            st.session_state.user_id = None
-            st.session_state.entered = True
-            st.session_state.page = "홈"
-            st.rerun()
+        ready = st.session_state.get("start_ready", False)
 
-        if not can_start:
-            st.caption("동의 체크 후 이름을 입력하고 Enter를 누르면 시작할 수 있어요.")
+        with st.form("start_form", border=False):
+            st.text_input(
+                "이름",
+                value=st.session_state.user_name,
+                placeholder="이름 또는 닉네임을 입력해 주세요",
+                max_chars=20,
+                label_visibility="collapsed",
+                key="start_name",
+            )
+            submitted = st.form_submit_button(
+                "시작하기",
+                type="primary" if ready else "secondary",   # 준비되면 파란색
+                use_container_width=True,
+            )
+
+        if submitted:
+            name = st.session_state.get("start_name", "").strip()
+
+            if not agreed:
+                st.warning("먼저 '동의합니다'에 체크해 주세요.")
+            elif not name:
+                st.session_state.start_ready = False
+                st.warning("이름 또는 닉네임을 입력해 주세요.")
+            elif ready and name == st.session_state.get("start_ready_name"):
+                _enter_app()                          # 파란 버튼 상태 → 다음 화면
+                st.rerun()
+            else:
+                st.session_state.start_ready = True   # 이름 확정 → 버튼 파란색
+                st.session_state.start_ready_name = name
+                st.rerun()
+
+        # 안내 문구
+        if not agreed:
+            st.caption("먼저 '동의합니다'에 체크해 주세요.")
+        elif not ready:
+            st.caption("이름을 입력하고 Enter를 누르면 [시작하기]가 파란색으로 바뀌어요.")
+        else:
+            st.caption("Enter를 한 번 더 누르거나 [시작하기]를 클릭하면 시작합니다.")
 
 
 # ==========================================================
