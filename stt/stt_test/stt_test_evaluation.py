@@ -4,18 +4,15 @@ import sys
 import glob
 import pandas as pd
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = current_dir
-for _ in range(3):
-    parent_dir = os.path.dirname(parent_dir)
-    if os.path.exists(os.path.join(parent_dir, "stt.py")) and os.path.exists(os.path.join(parent_dir, "core.py")):
-        if parent_dir not in sys.path:
-            sys.path.append(parent_dir)
-        break
+current_dir = os.path.dirname(os.path.abspath(__file__))  # stt/stt_test 폴더
+stt_dir = os.path.dirname(current_dir)                    # stt 폴더 (stt.py 위치)
+project_root = os.path.dirname(stt_dir)                   # project 루트 폴더
+src_core_dir = os.path.join(project_root, "src_core")     # src_core 폴더 (core.py 위치)
 
-# 만약 상위가 아니라 동일 폴더에 있다면 현재 폴더 추가
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
+if stt_dir not in sys.path:
+    sys.path.append(stt_dir)
+if src_core_dir not in sys.path:
+    sys.path.append(src_core_dir)
 
 try:
     from stt import PronunciationPipeline
@@ -26,7 +23,7 @@ except ImportError as e:
 
 
 def main():
-    # 1. 오디오 파일이 들어있는 폴더 경로 지정 (stt_test/stt_test_audio)
+    # 1. 오디오 파일이 들어있는 폴더 경로 지정 (stt/stt_test/stt_test_audio)
     target_dir = os.path.join(current_dir, "stt_test_audio")
     if not os.path.exists(target_dir):
         target_dir = current_dir
@@ -113,7 +110,7 @@ def main():
         except Exception as e:
             print(f"   └ [오류 발생] {file_name}: {e}")
 
-    # 5. 결과를 `stt_test` 폴더 안에 CSV 파일로 저장
+    # 5. 결과를 `stt/stt_test` 폴더 안에 CSV 파일로 저장
     if results:
         df = pd.DataFrame(results)
 
