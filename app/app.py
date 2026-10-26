@@ -16,7 +16,11 @@ PROJECT_DIR = APP_DIR.parent                   # project
 CORE_DIR = PROJECT_DIR / "src_core"
 STT_DIR = PROJECT_DIR / "src_stt"
 ENV_PATH = PROJECT_DIR / "src_db" / ".env"
-ASSETS_DIR = APP_DIR / "assets"
+# 이미지 폴더: app/assets 를 먼저 찾고, 없으면 프로젝트 루트의 assets 사용
+ASSETS_DIR = next(
+    (d for d in (APP_DIR / "assets", PROJECT_DIR / "assets") if d.exists()),
+    APP_DIR / "assets",
+)
 BG_IMAGE_PATH = ASSETS_DIR / "bg_hanji.jpg"              # 2번째 페이지부터
 START_IMAGE_PATH = ASSETS_DIR / "start_hero.jpg"         # 첫 페이지 (전체 화면)
 
@@ -39,7 +43,15 @@ st.set_page_config(
 # ==========================================================
 # 3. 페이지 함수 연결
 # ==========================================================
-from apps.app_home import page_start, page_home  # noqa: E402
+# 시작·홈 화면 버전 선택
+#   False → 디자인 버전 (app_home.py, CSS 사용, 포스터·한지 배경)
+#   True  → 기본 버전 (app_home_basic.py, CSS 없음, 배경 없음)
+USE_BASIC_HOME = False
+
+if USE_BASIC_HOME:
+    from apps.app_home_basic import page_start, page_home  # noqa: E402
+else:
+    from apps.app_home import page_start, page_home  # noqa: E402
 
 
 def _coming_soon(title):
@@ -126,7 +138,7 @@ def apply_start_background():
 
     # 넓은 화면에서 좌우 여백은 같은 이미지의 블러본으로 채움
     # (블러 파일이 없으면 원본으로 대신 채움)
-    blur_path = APP_DIR / "assets" / "start_hero_blur.jpg"
+    blur_path = ASSETS_DIR / "start_hero_blur.jpg"
     blur = load_image_base64(str(blur_path)) if blur_path.exists() else hero
 
     st.markdown(
@@ -244,21 +256,18 @@ def show_sidebar():
 # ==========================================================
 # 7. 메인
 # ==========================================================
-# 20~21번째 줄: 이미지 경로
-BG_IMAGE_PATH = ASSETS_DIR / "bg_hanji.jpg"        # 2번째 페이지부터
-START_IMAGE_PATH = ASSETS_DIR / "start_hero.jpg"   # 첫 페이지
-
-# main() 함수
 def main():
     init_state()
     apply_style()
 
     if not st.session_state.entered:      # 첫 페이지 (이름 입력 전)
-        apply_start_background()          # → start_hero.jpg
+        if not USE_BASIC_HOME:
+            apply_start_background()      # → start_hero.jpg
         page_start()
         return
 
-    apply_background()                    # 2번째 페이지부터 → bg_hanji.jpg
+    if not USE_BASIC_HOME:
+        apply_background()                # 2번째 페이지부터 → bg_hanji.jpg
     show_sidebar()
     PAGES[st.session_state.page]()
 
