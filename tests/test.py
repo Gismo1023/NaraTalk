@@ -9,7 +9,7 @@ VOICE = "en-US-AndrewNeural"  # 또는
 # zh-CN-XiaoxiaoNeural
 
 # 2. 저장할 폴더 이름 설정
-OUTPUT_DIR = "test용 audio"
+OUTPUT_DIR = "tts_test/test용 audio"
 
 
 async def generate_foreign_accent_wav(text: str, output_path: str):
