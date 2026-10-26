@@ -16,7 +16,7 @@ def page_history():
         st.metric("평균 점수", "-")
 
     with col3:
-        st.metric("연속 학습일", "-")
+        st.metric("총 학습일", "-")
 
     st.divider()
     st.subheader("조회 조건")

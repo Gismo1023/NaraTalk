@@ -11,7 +11,7 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 from src.tts import generate_audio_on_fly
-from src.db import get_sentences
+from src.db import get_sentences, save_practice_run
 from src.stt import PronunciationPipeline
 # 버전 호환성
 import av
@@ -319,17 +319,55 @@ def page_practice():
                             level=selected_sentence["level"],
                         )
 
-                    # 결과 화면에서 사용할 데이터 저장
-                    st.session_state.evaluation_result = report
-                    st.session_state.selected_sentence = selected_sentence
+                    # DB 저장에 필요한 회원 ID와 문장 ID 확인
+                    try:
+                        details = report.get("cer_details", {})
 
-                    # 결과 화면으로 이동
-                    st.session_state.page = "결과"
-                    st.rerun()
+                        user_id = st.session_state.get("user_id")
+                        sentence_id = selected_sentence.get("id")
+                        transcript = report.get("transcript", "")
+
+                        if user_id is None:
+                            st.error("DB 저장 실패: 회원 ID가 없습니다.")
+                            st.stop()
+
+                        if sentence_id is None:
+                            st.error("DB 저장 실패: 문장 DB ID가 없습니다.")
+                            st.stop()
+
+                        if not transcript.strip():
+                            st.warning("인식된 문장이 없어 저장하지 않았습니다.")
+                            st.stop()
+
+                        run_id = save_practice_run(
+                            user_id=user_id,
+                            sentence_id=sentence_id,
+                            transcript=transcript,
+                            wer=report["wer"],
+                            cer=report["cer"],
+                            latency_ms=report["latency_ms"],
+                            score=report["score"],
+                            grade=report["grade"],
+                            feedback=report["feedback"],
+                            substitutions=details["substitutions"],
+                            deletions=details["deletions"],
+                            insertions=details["insertions"],
+                        )
+
+                        st.success(f"DB 저장 성공! 기록 ID: {run_id}")
+
+                        st.session_state.evaluation_result = report
+                        st.session_state.selected_sentence = selected_sentence
+                        st.session_state.practice_run_id = run_id
+                        st.session_state.page = "결과"
+                        st.rerun()
+
+                    except Exception as e:
+                        st.error(f"학습 기록 DB 저장 실패: {e}")
+                        st.exception(e)
 
             except Exception as e:
                 st.error(f"음성 분석 중 오류가 발생했습니다: {e}")
-                st.exception(e)
 
             finally:
                 # 임시 파일 정리
