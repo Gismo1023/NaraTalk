@@ -4,7 +4,6 @@ import streamlit as st
 from datetime import datetime, date, timedelta
 from src.db import register_user, login_user, get_practice_history
 
-
 def page_start():
     _, center, _ = st.columns([1, 2, 1])
 
