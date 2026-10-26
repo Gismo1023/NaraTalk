@@ -1,0 +1,35 @@
+category,ko,en,difficulty
+필수 기초 회화,안  녕하세요  !,Hello!,쉬움
+필수 기초 회화,감사합니다    !,Thank you!,쉬움
+필수 기초 회화,죄송합니다   .,I'm sorry!,쉬움
+필수 기초 회화,도와주세요  !,"Help me, please!",쉬움
+이동 및 길찾기,여기  어디에요  ?,Where am I?,쉬움
+이동 및 길찾기,화장실  어디에  있어요 ?,Where is the restroom?,쉬움
+이동 및 길찾기,서울역으로  가는  지하철은  어디서  타요  ?,Where do I take the subway to Seoul Station?,보통
+이동 및 길찾기,공항에  어떻게  가요  ?,How do I get to the airport?,보통
+이동 및 길찾기,이  버스가  명동역으로  가나요  ?,Does this bus go to Myeongdong Station?,어려움
+이동 및 길찾기,교통카드  보증금은  어디서  환급받을  수  있나요  ?,Where can I get a refund for the transit card deposit?,어려움
+이동 및 길찾기,환승  할인  적용받으려면  몇  분  이내에  갈아타야  하죠  ?,Within how many minutes do I need to transfer for the transfer discount?,어려움
+숙박 및 기타,짐을  맡기고  싶어요  .,Can I store my bags here?,쉬움
+숙박 및 기타,체크인  하고  싶어요  .,.,"I'd like to check in .",쉬움
+숙박 및 기타,와이파이  비밀번호가  뭐예요  ?,What is the Wi-Fi password?,쉬움
+숙박 및 기타,방에  열쇠를  두고  나왔어요  .,I left my key inside the room.,보통
+숙박 및 기타,부대  시설이  어디에  있나요  ?,Where are the facilities?,보통
+숙박 및 기타,영어를  할  수  있는  직원이  있나요  ?,Is there anyone who speaks English?,어려움
+숙박 및 기타,근처에  약국이  어디에  있나요  ?,Where is the nearest pharmacy?,어려움
+숙박 및 기타,배터리가  다  돼서  그러는데  충전  좀  할  수  있을까요  ?,"My battery is dead. Could I charge my phone here?",어려움
+가격 및 쇼핑,얼마예요  ?,How much is this?,쉬움
+가격 및 쇼핑,이것  주세요  .,"I'll take this, please.",쉬움
+가격 및 쇼핑,깎아주세요  .,Please give me a discount.,보통
+가격 및 쇼핑,카드  결제  돼요  ?,Can I pay by card?,보통
+가격 및 쇼핑,영수증은  안  주셔도  괜찮습니다  .,You don't need to give me the receipt.,어려움
+가격 및 쇼핑,혹시  다른  사이즈나  색상도  있나요  ?,Do you have this in any other size or color?,어려움
+가격 및 쇼핑,면세  받을  수  있나요  ?,Can I get a tax refund?,어려움
+식당 및 주문,물  주세요  .,"Water, please.",쉬움
+식당 및 주문,메뉴판  좀  주세요  .,"Menu, please.",쉬움
+식당 및 주문,이거  하나  주세요  .,"One of this, please.",보통
+식당 및 주문,맵지  않게  해주세요  .,Please make it not spicy.,보통
+식당 및 주문,추천해주실  만한  대표  메뉴가  있나요  ?,Do you have any signature dishes you can recommend?,어려움
+식당 및 주문,고기는  빼고  만들어  주실  수  있나요  ?,Can you make this without meat?,어려움
+식당 및 주문,포장  되나요  ?,Can I get this to go?,어려움
+식당 및 주문,계산서  먼저  주세요  .,"Could I have the check, please?",어려움
