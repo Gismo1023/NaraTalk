@@ -1,6 +1,8 @@
-import streamlit as st
+# app_home.py
 
-from src.db import register_user, login_user
+import streamlit as st
+from datetime import datetime, date, timedelta
+from src.db import register_user, login_user, get_practice_history
 
 
 def page_start():
@@ -86,6 +88,61 @@ def page_start():
             except Exception as e:
                 st.error(f"회원 정보를 처리하지 못했습니다: {e}")
 
+def calculate_home_statistics(rows):
+    today = date.today()
+
+    # 오늘 학습 기록
+    today_rows = [
+        row for row in rows
+        if row.get("created_at") is not None
+        and (
+            row["created_at"].date()
+            if isinstance(row["created_at"], datetime)
+            else row["created_at"]
+        ) == today
+    ]
+
+    # 오늘 평균 점수
+    scores = [
+        float(row["score"])
+        for row in today_rows
+        if row.get("score") is not None
+    ]
+
+    today_count = len(today_rows)
+    today_average = (
+        sum(scores) / len(scores)
+        if scores else None
+    )
+
+    # 학습한 날짜 목록
+    learning_dates = set()
+
+    for row in rows:
+        created_at = row.get("created_at")
+
+        if created_at is None:
+            continue
+
+        record_date = (
+            created_at.date()
+            if isinstance(created_at, datetime)
+            else created_at
+        )
+
+        if isinstance(record_date, date):
+            learning_dates.add(record_date)
+
+    # 오늘 학습했다면 오늘부터, 아니라면 어제부터 연속일 계산
+    current_day = today if today in learning_dates else today - timedelta(days=1)
+    streak = 0
+
+    while current_day in learning_dates:
+        streak += 1
+        current_day -= timedelta(days=1)
+
+    return today_count, today_average, streak
+
 
 def page_home():
     st.title("홈")
@@ -95,26 +152,28 @@ def page_home():
     )
 
     # 요약 정보
-    col1, col2, col3 = st.columns(3)
+    try:
+        user_id = st.session_state.user_id
+        rows = get_practice_history(user_id)
 
-    with col1:
-        st.metric("오늘 학습 횟수", "-")
+        today_count, today_average, streak = calculate_home_statistics(rows)
 
-    with col2:
-        st.metric("오늘 평균 점수", "-")
+        col1, col2, col3 = st.columns(3)
 
-    with col3:
-        st.metric("연속 학습일", "-")
+        with col1:
+            st.metric("오늘 학습 횟수", f"{today_count}회")
 
-    # 나중에 데이터를 합치고 수정해야 하는 부분
-    # with col1:
-    #     st.metric("총 연습 횟수", f"{total_practice}회")
-    #
-    # with col2:
-    #     st.metric("평균 점수", f"{average_score:.1f}점")
-    #
-    # with col3:
-    #     st.metric("연속 학습일", f"{streak_days}일")
+        with col2:
+            if today_average is None:
+                st.metric("오늘 평균 점수", "-")
+            else:
+                st.metric("오늘 평균 점수", f"{today_average:.1f}점")
+
+        with col3:
+            st.metric("연속 학습일", f"{streak}일")
+
+    except Exception as e:
+        st.error(f"학습 통계를 불러오지 못했습니다: {e}")
 
     st.divider()
     st.subheader("바로가기")

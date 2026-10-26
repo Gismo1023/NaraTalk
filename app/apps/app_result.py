@@ -1,3 +1,5 @@
+# app_result.py
+
 import streamlit as st
 from korean_romanizer.romanizer import Romanizer
 
