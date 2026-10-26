@@ -1,3 +1,4 @@
+# app_result.py
 
 import streamlit as st
 from korean_romanizer.romanizer import Romanizer
@@ -161,9 +162,18 @@ def page_result():
         if audio_source:
             st.caption(f"입력 방식: {audio_source}")
 
+        # 업로드한 파일 형식에 맞춰 음성 재생 (추가부분)
+        audio_format = "audio/wav"
+        if audio_source == "upload":
+            file_name = recorded_audio.name.lower()
+            if file_name.endswith(".mp3"):
+                audio_format = "audio/mpeg"
+            elif file_name.endswith(".m4a"):
+                audio_format = "audio/mp4"
+
         st.audio(
             recorded_audio,
-            format="audio/wav",
+            format=audio_format,
         )
     else:
         st.info("녹음하거나 업로드한 음성이 없습니다.")
@@ -182,10 +192,15 @@ def page_result():
             f"{report.get('feedback', '피드백이 없습니다.')}"
         )
 
-    # 오류(오답) 및 오류유형 표시
+    # 오류(오답) 및 오류유형 표시 (수정한 부분)
 
     st.divider()
 
     if st.button("다시 연습하기", use_container_width=True):
+        st.session_state.recorded_audio = None
+        st.session_state.audio_source = None
+        st.session_state.evaluation_result = None
+        st.session_state.saved_run_id = None
+        st.session_state.save_error = None
         st.session_state.page = "연습하기"
         st.rerun()
