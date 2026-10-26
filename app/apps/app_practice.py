@@ -11,7 +11,7 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 from src.tts import generate_audio_on_fly
-from src.db import get_sentences
+from src.db import get_sentences, save_practice_run
 from src.stt import PronunciationPipeline
 # 버전 호환성
 import av
@@ -322,6 +322,30 @@ def page_practice():
                     # 결과 화면에서 사용할 데이터 저장
                     st.session_state.evaluation_result = report
                     st.session_state.selected_sentence = selected_sentence
+
+                    # 연습 결과 DB 저장
+                    st.session_state.saved_run_id = None
+                    st.session_state.save_error = None
+
+                    try:
+                        details = report["cer_details"]
+                        run_id = save_practice_run(
+                            user_id=st.session_state.user_id,
+                            sentence_id=selected_sentence["id"],
+                            transcript=report["transcript"],
+                            wer=report["wer"],
+                            cer=report["cer"],
+                            latency_ms=report["latency_ms"],
+                            score=report["score"],
+                            grade=report["grade"],
+                            feedback=report["feedback"],
+                            substitutions=details["substitutions"],
+                            deletions=details["deletions"],
+                            insertions=details["insertions"],
+                        )
+                        st.session_state.saved_run_id = run_id
+                    except Exception as error:
+                        st.session_state.save_error = str(error)
 
                     # 결과 화면으로 이동
                     st.session_state.page = "결과"
