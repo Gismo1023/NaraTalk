@@ -10,8 +10,8 @@ category,ko,en,difficulty
 이동 및 길찾기,이 버스가 명동역으로 가나요?,Does this bus go to Myeongdong Station?,어려움
 이동 및 길찾기,교통카드 보증금은 어디서 환급받을 수 있나요?,Where can I get a refund for the transit card deposit?,어려움
 이동 및 길찾기,환승 할인 적용받으려면 몇 분 이내에 갈아타야 하죠?,Within how many minutes do I need to transfer for the transfer discount?,어려움
-숙박 및 기타,짐을 맡기고 싶어요.,Can I store my bags here?,쉬움
-숙박 및 기타,체크인 하고 싶어요.,"I'd like to check in .",쉬움
+숙박 및 기타,짐을  맡기고 싶어요.,Can I store my bags here?,쉬움
+숙박 및 기타,체크인 하고싶어요.,"I'd like to check in .",쉬움
 숙박 및 기타,와이파이 비밀번호가 뭐예요?,What is the Wi-Fi password?,쉬움
 숙박 및 기타,방에 열쇠를 두고 나왔어요.,I left my key inside the room.,보통
 숙박 및 기타,부대 시설이 어디에 있나요?,Where are the facilities?,보통

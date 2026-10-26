@@ -7,8 +7,8 @@ FROM sentences ORDER BY sentence_no;
 
 -- 연습 내역은 생성된 기록이 있을 때만 표시됩니다.
 SELECT u.nickname, s.ko AS reference, s.level, p.transcript,
-       p.wer, p.cer, p.status,
-       CASE WHEN p.status THEN '합격' ELSE '불합격' END AS status_label,
+       p.wer, p.cer, p.score, p.grade, p.feedback,
+       p.substitutions, p.deletions, p.insertions,
        p.created_at
 FROM practice_runs AS p
 JOIN users AS u ON p.user_id = u.id
