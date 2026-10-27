@@ -275,6 +275,15 @@ def delete_error_item(error_id):
             cursor.execute(load_sql('delete_error_item.sql'), (error_id,))
             return cursor.fetchone() is not None
 
+# 관리자 로그인
+def login_manager(password):
+    if not password:
+        return None
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('login_manager.sql'), (password,))
+            return cursor.fetchone()
 
 if __name__ == '__main__':
     initialize_database()
