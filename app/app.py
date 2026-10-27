@@ -1,3 +1,5 @@
+# app.py
+
 # python -m streamlit run app/app.py
 import streamlit as st
 import sys
@@ -10,6 +12,7 @@ from apps.app_practice import page_practice
 from apps.app_result import page_result
 from apps.app_history import page_history
 from apps.app_dashboard import page_dashboard
+from apps.app_manager import page_manager
 
 # 프로젝트 경로 설정
 
@@ -97,6 +100,7 @@ def show_sidebar():
             "결과",
             "학습 이력",
             "분석 대시보드",
+            "관리자"
         ]
 
         if st.session_state.page not in pages:
@@ -145,6 +149,8 @@ def main():
     elif page == "분석 대시보드":
         page_dashboard()
 
+    elif page == "관리자":
+        page_manager()
 
 if __name__ == "__main__":
     main()
