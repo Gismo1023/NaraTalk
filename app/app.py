@@ -99,9 +99,10 @@ def show_sidebar():
             "연습하기",
             "결과",
             "학습 이력",
-            "분석 대시보드",
-            "관리자"
+            "분석 대시보드"
         ]
+        if st.session_state.get("is_admin", False):
+            pages.append("관리자")
 
         if st.session_state.page not in pages:
             st.session_state.page = "홈"
