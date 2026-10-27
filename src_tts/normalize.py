@@ -3,29 +3,38 @@ import re
 from pathlib import Path
 from dotenv import load_dotenv
 
-# db.py에서 필요한 함수 임포트
-from src_db.db import get_connection, load_sql, initialize_database, get_sentences_grouped
-
 load_dotenv()
 
+
 def normalize_korean(text):
-    """한국어 텍스트 전처리: 공백 통일 및 끝 문장부호(? ! .) 유지"""
+    """
+    한국어 텍스트 전처리 고도화:
+    - 글자 사이에 들어간 비정상적인 불필요한 공백 제거 (예: '안  녕' -> '안녕')
+    - 반복되는 지저분한 문장부호(?, !, .)를 단일 부호로 정제
+    """
     if not text:
         return ""
-    return re.sub(r"\s+", " ", text).strip()
 
+    # 1. 2칸 이상의 연속된 공백을 단일 공백으로 치환
+    text = re.sub(r"\s+", " ", text).strip()
 
-def init_database_table():
-    """db.py에 정의된 전체 초기화 함수(테이블 생성 + 시드 데이터 적재)를 호출합니다."""
-    try:
-        initialize_database()
-        print("✨ 데이터베이스 테이블 생성 및 초기화 성공!")
-    except Exception as e:
-        print(f"⚠️ 테이블 초기화 중 오류 발생: {e}")
+    # 2. 글자 사이에 찢어진 공백을 자연스러운 단어 형태로 복원
+    while re.search(r"([가-힣])\s+([가-힣])", text):
+        text = re.sub(r"([가-힣])\s+([가-힣])", r"\1\2", text)
+
+    # 3. 반복되는 문장부호 압축 및 정리 (예: '! ! !' -> '!')
+    text = re.sub(r"\.{2,}", ".", text)
+    text = re.sub(r"\?{2,}", "?", text)
+    text = re.sub(r"\!{2,}", "!", text)
+
+    # 4. 문장부호 앞에 불필요하게 붙은 공백 제거 (예: "안녕하세요 !" -> "안녕하세요!")
+    text = re.sub(r"\s+([?!.])", r"\1", text)
+
+    return text
 
 
 def preprocess_sentences(file_path="text.csv"):
-    """CSV 파일을 안전하게 읽어와 카테고리별로 분류하고 전처리 적용"""
+
     desired_order = [
         "필수 기초 회화",
         "이동 및 길찾기",
@@ -36,22 +45,29 @@ def preprocess_sentences(file_path="text.csv"):
 
     ordered_db = {cat: [] for cat in desired_order}
 
-    # 만약 CSV 파일이 없다면 DB에서 직접 그룹화된 데이터를 가져오는 대안도 고려할 수 있습니다.
+    # 파일 경로가 상대 경로일 때 상위 디렉토리(루트)의 text.csv도 탐색할 수 있도록 보완
+    path_obj = Path(file_path)
+    if not path_obj.exists():
+        parent_path = Path(__file__).resolve().parent.parent / "text.csv"
+        if parent_path.exists():
+            file_path = parent_path
+
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, "r", encoding="utf-8-sig") as f:  # utf-8-sig로 BOM 문제 예방
             reader = csv.DictReader(f)
             for row in reader:
-                category = row["category"]
+                category = row.get("category", "").strip()
+                ko_text = row.get("ko", "").strip()
+
                 item = {
-                    "ko": normalize_korean(row["ko"]),  # 한국어 정규화 적용
-                    "en": row["en"],                      # 영어 원본 유지
-                    "difficulty": row["difficulty"]       # 난이도 유지
+                    "ko": normalize_korean(ko_text),  # 한국어 정규화 적용
+                    "en": row.get("en", "").strip(),  # 영어 원본 유지
+                    "difficulty": row.get("difficulty", "").strip()  # 난이도 유지
                 }
                 if category in ordered_db:
                     ordered_db[category].append(item)
     except FileNotFoundError:
-        print(f"⚠️ '{file_path}' 파일을 찾지 못해 DB에서 데이터를 불러옵니다.")
-        ordered_db = get_sentences_grouped()
+        print(f"⚠️ '{file_path}' 파일을 찾지 못했습니다.")
 
     return ordered_db
 
@@ -59,11 +75,10 @@ def preprocess_sentences(file_path="text.csv"):
 # 전역에서 바로 가져다 쓸 수 있는 SENTENCES_DB 정의
 SENTENCES_DB = preprocess_sentences("text.csv")
 
-
 # 단독 테스트용 실행부
 if __name__ == "__main__":
-    print("=== 데이터베이스 테이블 초기화 시도 ===")
-    init_database_table()
-
-    print("\n=== 정규화 및 순서 고정이 완료된 SENTENCES_DB ===")
-    print(SENTENCES_DB)
+    print("\n=== 정규화 및 순서 고정이 완료된 SENTENCES_DB 테스트 ===")
+    for cat, items in SENTENCES_DB.items():
+        print(f"\n[{cat}] (총 {len(items)}개 문장)")
+        for item in items[:2]:  # 테스트로 카테고리당 앞 2개씩만 출력
+            print(f"  - ko: {item['ko']} / en: {item['en']}")
