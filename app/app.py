@@ -1,35 +1,43 @@
+# app.py
 # python -m streamlit run app/app.py
 import streamlit as st
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
-# 페이지 함수 연결
+# 프로젝트 경로를 먼저 설정해 apps와 src를 import할 수 있게 합니다.
+APP_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = APP_DIR.parent
+for path in (APP_DIR, PROJECT_DIR, PROJECT_DIR / "src_core", PROJECT_DIR / "src_stt"):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
+
+# 실제 DB 모듈이 사용하는 src/.env 우선, 이전 src_db/.env도 지원
+ENV_PATH = PROJECT_DIR / "src" / ".env"
+if not ENV_PATH.exists():
+    ENV_PATH = PROJECT_DIR / "src_db" / ".env"
+load_dotenv(ENV_PATH, override=True)
+
+# CSS 전용 파일에서 스타일만 불러옵니다.
+from css.app_css import apply_style, apply_start_background, apply_background
+from css.app_home_css import apply_start_style, apply_home_style
+
+# 기존 페이지 구현은 apps에서 그대로 사용합니다.
 from apps.app_home import page_start, page_home
 from apps.app_practice import page_practice
 from apps.app_result import page_result
 from apps.app_history import page_history
 from apps.app_dashboard import page_dashboard
 
-# 프로젝트 경로 설정
+try:
+    from apps.app_manager import page_manager
+except ModuleNotFoundError as error:
+    if error.name != "apps.app_manager":
+        raise
 
-PROJECT_DIR = Path(__file__).resolve().parent.parent
-
-if str(PROJECT_DIR) not in sys.path:
-    sys.path.insert(0, str(PROJECT_DIR))
-
-# 환경 변수 설정
-# 기존 경로 유지
-ENV_PATH = PROJECT_DIR / "src_db" / ".env"
-load_dotenv(ENV_PATH, override=True)
-
-# 기존 STT 모듈 검색 경로 설정
-CORE_DIR = PROJECT_DIR / "src_core"
-STT_DIR = PROJECT_DIR / "src_stt"
-
-for path in (CORE_DIR, STT_DIR):
-    if str(path) not in sys.path:
-        sys.path.insert(0, str(path))
+    def page_manager():
+        st.title("관리자")
+        st.info("app_manager.py 파일이 없어 관리자 화면을 표시할 수 없습니다.")
 
 # ==========================================================
 
@@ -55,32 +63,6 @@ def init_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
-# 공통 스타일
-def apply_style():
-    st.markdown(
-        """
-        <style>
-        .section-label {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .section-content {
-            font-size: 16px;
-            font-weight: 400;
-            line-height: 1.7;
-            overflow-wrap: anywhere;
-        }
-
-        .placeholder {
-            opacity: 0.65;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
 # 사이드바 메뉴 변경
 def change_page():
     st.session_state.page = st.session_state.sidebar_menu
@@ -97,6 +79,7 @@ def show_sidebar():
             "결과",
             "학습 이력",
             "분석 대시보드",
+            "관리자"
         ]
 
         if st.session_state.page not in pages:
@@ -122,15 +105,19 @@ def main():
 
     # 시작 페이지
     if not st.session_state.entered:
+        apply_start_background()
+        apply_start_style()
         page_start()
         return
 
     # 로그인 이후 사이드바 표시
+    apply_background()
     show_sidebar()
 
     page = st.session_state.page
 
     if page == "홈":
+        apply_home_style()
         page_home()
 
     elif page == "연습하기":
@@ -145,6 +132,8 @@ def main():
     elif page == "분석 대시보드":
         page_dashboard()
 
+    elif page == "관리자":
+        page_manager()
 
 if __name__ == "__main__":
     main()

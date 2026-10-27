@@ -1,26 +1,8 @@
-"""시작 페이지(이름 입력) + 홈 페이지."""
-import base64
-from pathlib import Path
-
+# css/app_home_css.py
+# 시작·홈 화면의 CSS만 관리합니다. 페이지 함수와 DB 로직은 apps/app_home.py에 있습니다.
 import streamlit as st
 
-ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"   # project/app/assets
-
-
-# ==========================================================
-# 공통
-# ==========================================================
-@st.cache_data
-def _image_base64(path: str) -> str:
-    return base64.b64encode(Path(path).read_bytes()).decode()
-
-
-def _go(page: str):
-    """버튼 클릭 시 페이지 이동 (on_click 콜백)."""
-    st.session_state.page = page
-
-
-def _home_style():
+def apply_home_style():
     st.markdown(
         """
         <style>
@@ -60,11 +42,27 @@ def _home_style():
         unsafe_allow_html=True,
     )
 
+    # 기존 홈 통계와 버튼에도 동일한 색감 적용
+    st.markdown(
+        """
+        <style>
+        [data-testid="stMetric"] {
+            background: rgba(255,255,255,0.60);
+            border: 1px solid rgba(84,112,180,0.20);
+            border-radius: 14px;
+            padding: 16px;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stButton"] button {
+            border-radius: 10px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
-# ==========================================================
-# 시작 페이지 (이름 입력 전)
-# ==========================================================
-def _start_style():
+
+
+def apply_start_style():
     """시작 화면 전용 스타일 (카드 없이 포스터 위에 바로 배치).
 
     포스터(start_hero.jpg)는 화면 높이에 꽉 맞춰 가운데 표시됨
@@ -262,129 +260,59 @@ def _start_style():
         unsafe_allow_html=True,
     )
 
-
-# 동의 문구 (예시 — 실제 문구로 교체해 사용)
-CONSENT_TITLE = "개인정보 및 음성 데이터 수집·이용 동의 (필수)"
-CONSENT_HTML = """
-<div class="consent-text">
-<b>1. 수집 항목</b>
-<ul>
-  <li>이름 또는 닉네임</li>
-  <li>발음 연습 시 녹음·업로드한 음성 데이터</li>
-  <li>음성 인식 결과(텍스트), 발음 평가 점수 및 학습 이력</li>
-</ul>
-<b>2. 이용 목적</b>
-<ul>
-  <li>AI 음성 인식(STT)을 통한 발음 분석 및 교정 피드백 제공</li>
-  <li>학습 이력 저장 및 학습 대시보드 제공</li>
-</ul>
-<b>3. 보유 및 이용 기간</b>
-<ul>
-  <li>서비스 이용 종료 또는 삭제 요청 시까지 보관 후 지체 없이 파기</li>
-</ul>
-<b>4. 동의 거부 권리</b>
-<ul>
-  <li>동의를 거부할 수 있으며, 거부 시 서비스 이용이 제한됩니다.</li>
-</ul>
-</div>
-"""
-
-
-def page_start():
-    """배경(start_hero.jpg)은 app.py에서 전체 화면으로 깔고, 부제·입력창·동의·버튼만 올림."""
-    _start_style()
-
+    # 기존 apps/app_home.py의 컬럼·체크박스·입력창에도 스타일 적용
     st.markdown(
-        '<div class="start-sub">듣고, 따라 말하고, 바로 교정받는 AI 한국어 발음 코치</div>',
+        """
+        <style>
+        [data-testid="stMainBlockContainer"] [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) {
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: clamp(35px, 12vh, 130px);
+        }
+        [data-testid="stMainBlockContainer"] h1,
+        [data-testid="stMainBlockContainer"] [data-testid="stCaptionContainer"] p {
+            color: #FFFFFF !important;
+            text-shadow: 0 2px 8px rgba(10, 15, 60, 0.7);
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stMarkdownContainer"] h3 {
+            color: #FFFFFF !important;
+            text-shadow: 0 1px 5px rgba(10, 15, 60, 0.65);
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stExpander"] details {
+            background: rgba(20, 24, 70, 0.50) !important;
+            border: 1px solid rgba(210, 214, 228, 0.65) !important;
+            border-radius: 10px !important;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stExpander"] summary p,
+        [data-testid="stMainBlockContainer"] [data-testid="stExpander"] summary svg,
+        [data-testid="stMainBlockContainer"] [data-testid="stExpanderDetails"] p,
+        [data-testid="stMainBlockContainer"] [data-testid="stExpanderDetails"] li,
+        [data-testid="stMainBlockContainer"] [data-testid="stCheckbox"] label p,
+        [data-testid="stMainBlockContainer"] [data-testid="stTextInput"] label p {
+            color: #FFFFFF !important;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stTextInput"] input {
+            background: rgba(20, 24, 70, 0.48) !important;
+            color: #FFFFFF !important;
+            -webkit-text-fill-color: #FFFFFF !important;
+            border-radius: 10px !important;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stTextInput"] input::placeholder {
+            color: rgba(255, 255, 255, 0.84) !important;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.84) !important;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stButton"] button[kind="secondary"],
+        [data-testid="stMainBlockContainer"] [data-testid="stButton"] button[kind="primary"] {
+            background: linear-gradient(180deg, #4062D6 0%, #2C45A8 100%) !important;
+            border-color: rgba(255, 255, 255, 0.75) !important;
+            border-radius: 10px !important;
+        }
+        [data-testid="stMainBlockContainer"] [data-testid="stButton"] button p {
+            color: #FFFFFF !important;
+        }
+        </style>
+        """,
         unsafe_allow_html=True,
     )
 
-    with st.container(key="start_card"):
-        # ① 동의 문구: 클릭하면 아래로 펼쳐짐
-        #    '동의합니다'를 체크하면 제목이 바뀌면서 새로 그려져 자동으로 닫힘
-        already_agreed = st.session_state.get("start_agreed", False)
-        title = f"✅ {CONSENT_TITLE}" if already_agreed else CONSENT_TITLE
-        with st.expander(title, expanded=False):
-            st.markdown(CONSENT_HTML, unsafe_allow_html=True)
-
-        # ② 동의 체크박스
-        agreed = st.checkbox("동의합니다", key="start_agreed")
-
-        # ③ 이름 입력 (form을 쓰지 않아야 입력·체크 상태에 따라 버튼을 바로 켜고 끌 수 있음)
-        name = st.text_input(
-            "이름",
-            value=st.session_state.user_name,
-            placeholder="이름 또는 닉네임을 입력해 주세요",
-            max_chars=20,
-            label_visibility="collapsed",
-            key="start_name",
-        )
-
-        # ④ 이름 입력 + 동의 체크가 모두 되어야 시작하기 활성화
-        can_start = bool(name.strip()) and agreed
-
-        if st.button(
-            "시작하기",
-            use_container_width=True,
-            disabled=not can_start,
-            key="start_button",
-        ):
-            st.session_state.user_name = name.strip()
-            st.session_state.consent_agreed = True
-            # TODO: DB 연동 시 사용자 조회/생성 후 user_id·동의 일시 저장
-            st.session_state.user_id = None
-            st.session_state.entered = True
-            st.session_state.page = "홈"
-            st.rerun()
-
-
-# ==========================================================
-# 홈 페이지 (이름 입력 후)
-# ==========================================================
-def page_home():
-    _home_style()
-
-    name = st.session_state.user_name or "학습자"
-    st.title(f"{name}님, 반갑습니다 👋")
-    st.caption("오늘도 한 문장씩, 정확한 발음으로 말해 보세요.")
-    st.write("")
-
-    steps = [
-        ("STEP 1", "문장 듣기", "제시된 문장의 정답 발음을 먼저 들어 보세요."),
-        ("STEP 2", "따라 말하기", "마이크로 녹음하거나 음성 파일을 올리세요."),
-        ("STEP 3", "교정 받기", "AI가 틀린 부분과 개선 방법을 알려 드려요."),
-    ]
-
-    cols = st.columns(3, gap="medium")
-    for col, (num, title, desc) in zip(cols, steps):
-        with col:
-            st.markdown(
-                f"""
-                <div class="home-card">
-                    <div class="num">{num}</div>
-                    <div class="title">{title}</div>
-                    <div class="desc">{desc}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-    st.write("")
-    st.write("")
-
-    c1, c2, _ = st.columns([1, 1, 2])
-    with c1:
-        st.button(
-            "🎙️ 연습 시작하기",
-            type="primary",
-            use_container_width=True,
-            on_click=_go,
-            args=("연습하기",),
-        )
-    with c2:
-        st.button(
-            "📈 학습 이력 보기",
-            use_container_width=True,
-            on_click=_go,
-            args=("학습 이력",),
-        )
