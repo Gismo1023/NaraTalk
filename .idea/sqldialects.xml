@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/check_queries.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/create_error_items.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/create_practice_runs.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/create_sentences.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/create_users.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/delete_error_item.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/delete_practice_run.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/delete_sentence.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/delete_user.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/delete_user_practice_runs.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/extension_pgcrypto.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/get_error_items.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/get_practice_history.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/get_sentence.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/get_sentences_all.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/get_sentences_by_category.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/get_sentences_by_category_level.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/get_sentences_by_level.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/get_user_by_id.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/login_user.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/register_user.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/save_error_item.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/save_practice_run.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/seed_sentences_34.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/update_error_item.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/update_sentence.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/sql_schema_sql/update_user_nickname.sql" dialect="GenericSQL" />
+  </component>
+</project>
