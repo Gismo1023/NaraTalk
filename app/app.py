@@ -20,7 +20,7 @@ load_dotenv(ENV_PATH, override=True)
 
 # CSS 전용 파일에서 스타일만 불러옵니다.
 from css.app_css import apply_style, apply_start_background, apply_background
-from css.app_home_css import apply_start_style, apply_home_style
+from css.app_home import apply_start_style, apply_home_style
 
 # 기존 페이지 구현은 apps에서 그대로 사용합니다.
 from apps.app_home import page_start, page_home
