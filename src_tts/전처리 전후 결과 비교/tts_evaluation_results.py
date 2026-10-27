@@ -15,7 +15,7 @@ plt.rcParams['axes.unicode_minus'] = False
 
 VOICE = "ko-KR-SunHiNeural"
 
-current_dir = os.path.dirname(os.path.abspath(__file__))  # src_tts/test
+current_dir = os.path.dirname(os.path.abspath(__file__))  # src_tts/전처리 전후 결과 비교
 src_dir = os.path.dirname(current_dir)  # src_tts
 project_root = os.path.dirname(src_dir)  # 루트
 
