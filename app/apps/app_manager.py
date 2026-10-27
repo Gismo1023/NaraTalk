@@ -11,4 +11,3 @@ def page_manager():
 
     with st.container(border=True):
         st.caption("현재 DB에는 전처리 적용 전·후의 평가 결과가 따로 저장되지 않아 비교할 수 없습니다.")
-
