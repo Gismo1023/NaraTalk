@@ -216,17 +216,6 @@ def update_sentence(sentence_no, category, level, ko, en):
             return cursor.fetchone()
 
 
-# 연습 기록 합격/불합격 수정 (True=합격, False=불합격)
-def update_practice_status(run_id, status):
-    if type(status) is not bool:
-        raise ValueError('status는 True(합격) 또는 False(불합격)여야 합니다.')
-
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(load_sql('update_practice_status.sql'), (status, run_id))
-            return cursor.fetchone()
-
-
 # 개별 STT 오류 기록 수정
 def update_error_item(error_id, error_type, reference_token=None,
                       hypothesis_token=None, position=None):
