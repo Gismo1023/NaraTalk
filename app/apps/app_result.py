@@ -31,7 +31,7 @@ def page_result():
     if st.session_state.get("save_error"):
         st.warning("평가는 완료됐지만 DB에 학습 기록을 저장하지 못했습니다.")
     elif st.session_state.get("saved_run_id"):
-        st.success("학습 기록이 DB에 저장되었습니다.")
+        st.success("학습 결과를 확인해 주세요.")
 
     details = report.get("cer_details", {})
 
@@ -40,10 +40,10 @@ def page_result():
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric("WER", f"{report['wer'] * 100:.1f}%")
+        st.metric("단어 오류율(wer)", f"{report['wer'] * 100:.1f}%")
 
     with col2:
-        st.metric("CER", f"{report['cer'] * 100:.1f}%")
+        st.metric("글자/발음 오류율(cer)", f"{report['cer'] * 100:.1f}%")
 
     with col3:
         st.metric(

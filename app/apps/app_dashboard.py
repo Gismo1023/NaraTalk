@@ -99,7 +99,7 @@ def page_dashboard():
 
     st.divider()
 
-    st.subheader("전처리 전후 비교")
+    st.subheader("성장 그래프")
 
     with st.container(border=True):
-        st.caption("현재 DB에는 전처리 적용 전·후의 평가 결과가 따로 저장되지 않아 비교할 수 없습니다.")
+        daily_score = []
