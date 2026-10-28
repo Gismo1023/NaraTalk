@@ -90,9 +90,9 @@ def page_practice():
 
     else:
         # DB에 저장된 카테고리 목록
-        categories = sorted({
+        categories = list(dict.fromkeys(
             row["category"] for row in all_sentences
-        })
+        ))
 
         with col_category:
             selected_category = st.selectbox(
