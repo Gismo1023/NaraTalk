@@ -1,0 +1,32 @@
+녹음 동의 수집 기준 정의 
+(consent.txt)
+
+wav  유효성,모노,16khz  전처리 
+(승우님  UI에서 진행)
+
+학습/평가 데이터  분리 및 검증  
+(미 실행)
+
+문장 30개 생성완료 
+(text.csv)
+
+전처리 함수 생성 완료
+(normalize.py)
+
+외국풍 오디오 30개 생성 완료 
+(보관중 / result_comparison/test_audio)
+
+평가 데이터 30건 이상 실행
+(select * from practice_runs 웹 실행 기록 저장 테이블)  
+
+외국풍 오디오 wer/cer 수작업검증과 전체 비교
+(result_comparison)
+
+tts 자연스러움 ,명로도 청취후 평가
+ (listening_test에 csv생성후 등록칸 생성)
+
+stt 오류 분석시 전처리 전후 모델간 성능비교
+(validation : 수경님)
+
+텍스트 전처리 전후 성능 비교
+(test 디렉토리)

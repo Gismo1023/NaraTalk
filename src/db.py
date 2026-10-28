@@ -167,6 +167,27 @@ def save_error_item(run_id, error_type, reference_token=None,
             return cursor.fetchone()['id']
 
 
+# 하나의 연습에서 발생한 오류 여러 건을 한 번의 연결로 저장
+#   items: [{"error_type", "reference_token", "hypothesis_token", "position"}, ...]
+#   반환값: 저장한 건수
+def save_error_items(run_id, items):
+    rows = []
+    for item in items or []:
+        error_type = item.get("error_type")
+        if error_type not in ('substitution', 'deletion', 'insertion'):
+            raise ValueError('error_type은 substitution, deletion, insertion 중 하나여야 합니다.')
+        rows.append((run_id, error_type, item.get("reference_token"),
+                     item.get("hypothesis_token"), item.get("position")))
+
+    if not rows:
+        return 0
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.executemany(load_sql('save_error_item.sql'), rows)
+    return len(rows)
+
+
 # 회원별 STT 연습 내역 조회
 def get_practice_history(user_id):
     with get_connection() as conn:
@@ -213,17 +234,6 @@ def update_sentence(sentence_no, category, level, ko, en):
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute(load_sql('update_sentence.sql'), params)
-            return cursor.fetchone()
-
-
-# 연습 기록 합격/불합격 수정 (True=합격, False=불합격)
-def update_practice_status(run_id, status):
-    if type(status) is not bool:
-        raise ValueError('status는 True(합격) 또는 False(불합격)여야 합니다.')
-
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(load_sql('update_practice_status.sql'), (status, run_id))
             return cursor.fetchone()
 
 
@@ -274,6 +284,66 @@ def delete_error_item(error_id):
         with conn.cursor() as cursor:
             cursor.execute(load_sql('delete_error_item.sql'), (error_id,))
             return cursor.fetchone() is not None
+
+# 관리자 로그인
+def login_manager(password):
+    if not password:
+        return None
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('login_manager.sql'), (password,))
+            return cursor.fetchone()
+
+
+# 추가 5개
+#users에 등록된 전체 사용자 수를 정수로 반환한다.
+def get_count_users():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_count_users.sql'))
+            return cursor.fetchone()['total_users']
+
+
+#전체 사용자의 닉네임·등록일·연습 횟수를 최근 등록순으로 조회해 딕셔너리 리스트로 반환한다.
+def get_nickname_cteated_at():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_nickname_cteated_at.sql'))
+            return cursor.fetchall()
+
+
+#전체 사용자의 카테고리별 연습 횟수 상위 5개를 딕셔너리 리스트로 반환한다.
+def get_category_top5():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_category_top5.sql'))
+            return cursor.fetchall()
+
+
+#전체 사용자의 난이도별 연습 횟수 상위 3개를 딕셔너리 리스트로 반환한다.
+def get_level_top5():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_level_top5.sql'))
+            return cursor.fetchall()
+
+
+#전체 사용자의 문장 ID별 연습 횟수 상위 5개를 딕셔너리 리스트로 반환한다.
+def get_sentence_top5():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_sentence_top5.sql'))
+            return cursor.fetchall()
+
+
+# 전체 연습 기록의 평균 점수와 평균 처리시간을 조회한다.
+def get_manager_summary():
+    sql = load_sql("get_manager_summary.sql")
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            return cur.fetchone()
 
 
 if __name__ == '__main__':

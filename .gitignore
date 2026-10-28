@@ -11,9 +11,15 @@ venv/
 .env.*
 !.env.example
 <<<<<<< HEAD
+<<<<<<< HEAD
 # 오디파일 추가안함
 
 *.wav
 =======
 *.wav
 >>>>>>> 049191740a9e0dd1ef926bddb92d3e2537b595ff
+=======
+*.wav
+# 녹음 임시 파일 (음성 원본은 Git에 올리지 않음)
+temp_audio/
+>>>>>>> 06d9502f299fbbabe506eeac4fe92f871b6fb343

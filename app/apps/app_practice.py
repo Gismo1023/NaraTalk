@@ -13,7 +13,11 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 from src.tts import generate_audio_on_fly
+<<<<<<< HEAD
 from src.db import get_sentences, save_practice_run
+=======
+from src.db import get_sentences, save_practice_run, save_error_items
+>>>>>>> 06d9502f299fbbabe506eeac4fe92f871b6fb343
 from src.stt import PronunciationPipeline
 # 버전 호환성
 import av
@@ -90,9 +94,9 @@ def page_practice():
 
     else:
         # DB에 저장된 카테고리 목록
-        categories = sorted({
+        categories = list(dict.fromkeys(
             row["category"] for row in all_sentences
-        })
+        ))
 
         with col_category:
             selected_category = st.selectbox(
@@ -346,6 +350,14 @@ def page_practice():
                             insertions=details["insertions"],
                         )
                         st.session_state.saved_run_id = run_id
+<<<<<<< HEAD
+=======
+
+                        # 글자 단위 오류 위치 저장 (B06) → error_items 테이블
+                        st.session_state.saved_error_count = save_error_items(
+                            run_id, report.get("error_items", [])
+                        )
+>>>>>>> 06d9502f299fbbabe506eeac4fe92f871b6fb343
                     except Exception as error:
                         st.session_state.save_error = str(error)
 
