@@ -11,3 +11,5 @@ venv/
 .env.*
 !.env.example
 *.wav
+# 녹음 임시 파일 (음성 원본은 Git에 올리지 않음)
+temp_audio/

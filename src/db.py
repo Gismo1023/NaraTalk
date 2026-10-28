@@ -167,6 +167,27 @@ def save_error_item(run_id, error_type, reference_token=None,
             return cursor.fetchone()['id']
 
 
+# 하나의 연습에서 발생한 오류 여러 건을 한 번의 연결로 저장
+#   items: [{"error_type", "reference_token", "hypothesis_token", "position"}, ...]
+#   반환값: 저장한 건수
+def save_error_items(run_id, items):
+    rows = []
+    for item in items or []:
+        error_type = item.get("error_type")
+        if error_type not in ('substitution', 'deletion', 'insertion'):
+            raise ValueError('error_type은 substitution, deletion, insertion 중 하나여야 합니다.')
+        rows.append((run_id, error_type, item.get("reference_token"),
+                     item.get("hypothesis_token"), item.get("position")))
+
+    if not rows:
+        return 0
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.executemany(load_sql('save_error_item.sql'), rows)
+    return len(rows)
+
+
 # 회원별 STT 연습 내역 조회
 def get_practice_history(user_id):
     with get_connection() as conn:

@@ -32,7 +32,13 @@ def calculate_cer_details(reference: str, hypothesis: str) -> dict:
         dele = 0
         ins = len(hyp_no_space) if hyp_no_space else 0
         cer_val = 0.0 if not hyp_no_space else 1.0
-        return {"cer": cer_val, "substitutions": sub, "deletions": dele, "insertions": ins}
+        errors = [
+            {"error_type": "insertion", "reference_token": None,
+             "hypothesis_token": ch, "position": 1}
+            for ch in hyp_no_space
+        ]
+        return {"cer": cer_val, "substitutions": sub, "deletions": dele,
+                "insertions": ins, "errors": errors}
 
     cer_val = cer(ref_no_space, hyp_no_space)
     out = process_characters(ref_no_space, hyp_no_space)
@@ -41,34 +47,61 @@ def calculate_cer_details(reference: str, hypothesis: str) -> dict:
         "cer": round(float(cer_val), 4),
         "substitutions": out.substitutions,
         "deletions": out.deletions,
-        "insertions": out.insertions
+        "insertions": out.insertions,
+        "errors": extract_char_errors(out, ref_no_space, hyp_no_space),
     }
 
 
-def evaluate_grade_and_feedback(cer_val: float) -> tuple[str, str, float]:
-    raw_score = (1.0 - cer_val) * 100.0  # 마이너스 연산자 정상 적용
-    score = max(0.0, round(raw_score, 1))
+# 글자 단위 오류 목록 추출 (B06 오류 위치)
+#   jiwer 정렬 결과(alignments)를 한 글자씩 풀어서
+#   [{"error_type", "reference_token", "hypothesis_token", "position"}, ...] 로 반환
+#   position: 정답 문장(공백 제외)에서 몇 번째 글자인지 (1부터 시작)
+#             삽입(insertion)은 "이 위치 앞에 끼어든 글자"를 뜻함
+def extract_char_errors(out, ref: str, hyp: str) -> list:
+    errors = []
+    alignments = getattr(out, "alignments", None) or [[]]
 
+    for chunk in alignments[0]:
+        rs, re_, hs, he = (chunk.ref_start_idx, chunk.ref_end_idx,
+                           chunk.hyp_start_idx, chunk.hyp_end_idx)
+
+        if chunk.type == "substitute":
+            for i in range(re_ - rs):
+                errors.append({"error_type": "substitution",
+                               "reference_token": ref[rs + i],
+                               "hypothesis_token": hyp[hs + i],
+                               "position": rs + i + 1})
+        elif chunk.type == "delete":
+            for i in range(re_ - rs):
+                errors.append({"error_type": "deletion",
+                               "reference_token": ref[rs + i],
+                               "hypothesis_token": None,
+                               "position": rs + i + 1})
+        elif chunk.type == "insert":
+            for i in range(he - hs):
+                errors.append({"error_type": "insertion",
+                               "reference_token": None,
+                               "hypothesis_token": hyp[hs + i],
+                               "position": rs + 1})
+    return errors
+
+def evaluate_grade_and_feedback(cer_val: float) -> tuple[str, str, float]:
+    # 점수 = 전사 일치도(100 - CER×100). 보정 없이 그대로 사용
+    # CER이 100%를 넘으면(삽입 과다) 0점으로 표시 (CER 원값은 별도로 저장됨)
+    score = max(0.0, round((1.0 - cer_val) * 100.0, 1))
+
+    # 등급·피드백만 CER 구간으로 결정
     if cer_val <= 0.15:
         grade = "매우 우수"
-        feedback = "완벽해요! 원어민처럼 매우 정확한 발음입니다."
-        if score < 85.0:
-            score = 85.0
+        feedback = "완벽해요! 정답 문장과 거의 같게 인식되었습니다."
     elif cer_val <= 0.45:
         grade = "양호한 수준"
-        feedback = "좋아요! 의사소통에 문제없지만 일부 음절을 더 명확히 해보세요."
-        if score >= 85.0:
-            score = 84.9
-        if score < 75.0:
-            score = 75.0
+        feedback = "좋아요! 일부 음절이 다르게 인식되었어요. 정답을 듣고 다시 말해 보세요."
     else:
         grade = "기초에 집중"
         feedback = "기초부터 다시 차근차근 읽어볼까요?"
-        if score >= 75.0:
-            score = 74.9
 
     return grade, feedback, score
-
 
 # 종합 발음 평가 함수
 def evaluate_pronunciation(reference_text: str, hypothesis_text: str, level: str = "보통", latency_ms: int = 0) -> dict:
@@ -92,6 +125,7 @@ def evaluate_pronunciation(reference_text: str, hypothesis_text: str, level: str
             "deletions": cer_info["deletions"],
             "insertions": cer_info["insertions"]
         },
+        "error_items": cer_info.get("errors", []),   # 글자 단위 오류 위치 (error_items 테이블 저장용)
         "wer": wer_val,
         "score": score,
         "grade": grade,
