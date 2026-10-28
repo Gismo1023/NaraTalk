@@ -295,6 +295,51 @@ def login_manager(password):
             cursor.execute(load_sql('login_manager.sql'), (password,))
             return cursor.fetchone()
 
+
+# 추가 5개
+#users에 등록된 전체 사용자 수를 정수로 반환한다.
+def get_count_users():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_count_users.sql'))
+            return cursor.fetchone()['total_users']
+
+
+#전체 사용자의 닉네임·등록일·연습 횟수를 최근 등록순으로 조회해 딕셔너리 리스트로 반환한다.
+def get_nickname_cteated_at():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_nickname_cteated_at.sql'))
+            return cursor.fetchall()
+
+
+#전체 사용자의 카테고리별 연습 횟수 상위 5개를 딕셔너리 리스트로 반환한다.
+def get_category_top5():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_category_top5.sql'))
+            return cursor.fetchall()
+
+
+#전체 사용자의 난이도별 연습 횟수 상위 3개를 딕셔너리 리스트로 반환한다.
+def get_level_top5():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_level_top5.sql'))
+            return cursor.fetchall()
+
+
+#전체 사용자의 문장 ID별 연습 횟수 상위 5개를 딕셔너리 리스트로 반환한다.
+def get_sentence_top5():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_sentence_top5.sql'))
+            return cursor.fetchall()
+
+
+
+
+
 if __name__ == '__main__':
     initialize_database()
     print(f'문장 등록 확인: {len(get_sentences())}개')
