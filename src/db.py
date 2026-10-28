@@ -336,13 +336,14 @@ def get_sentence_top5():
             cursor.execute(load_sql('get_sentence_top5.sql'))
             return cursor.fetchall()
 
-# 관리자가 최근 발생한 STT 오류 목록 조회 리스트로 반환
-def get_recent_errors():
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(load_sql('get_recent_errors.sql'))
-            return cursor.fetchall()
 
+# 전체 연습 기록의 평균 점수와 평균 처리시간을 조회한다.
+def get_manager_summary():
+    sql = load_sql("get_manager_summary.sql")
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            return cur.fetchone()
 
 
 if __name__ == '__main__':
