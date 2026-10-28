@@ -336,7 +336,12 @@ def get_sentence_top5():
             cursor.execute(load_sql('get_sentence_top5.sql'))
             return cursor.fetchall()
 
-
+# 관리자가 최근 발생한 STT 오류 목록 조회 리스트로 반환
+def get_recent_errors():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(load_sql('get_recent_errors.sql'))
+            return cursor.fetchall()
 
 
 
