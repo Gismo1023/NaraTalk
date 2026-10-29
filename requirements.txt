@@ -1,0 +1,29 @@
+# NaraTalk — 코드의 import 기준 의존성
+# 설치: pip install -r requirements.txt
+
+# 웹 UI (st.audio_input 사용 → 1.39 이상 필요, altair는 streamlit에 포함)
+streamlit>=1.40,<2
+
+# STT
+faster-whisper>=1.0
+
+# TTS
+edge-tts>=6.1
+
+# 오디오 처리
+librosa>=0.10
+soundfile>=0.12
+av>=12
+
+# 평가 지표 (WER/CER)
+jiwer>=3.0
+
+# DB (PostgreSQL / Neon)
+psycopg[binary]>=3.1
+python-dotenv>=1.0
+
+# 데이터·화면 보조
+pandas>=2.0
+korean-romanizer>=0.25
+
+noisereduce>=3.0
