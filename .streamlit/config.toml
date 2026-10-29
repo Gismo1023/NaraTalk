@@ -1,0 +1,6 @@
+[theme]
+base = "light"
+primaryColor = "#2C45A8"
+backgroundColor = "#E9E3D6"          # bg_hanji.jpg 종이 부분 평균색
+secondaryBackgroundColor = "#DDD8CB" # 사이드바·입력칸 (배경보다 5% 진하게)
+textColor = "#2B2B2B"
