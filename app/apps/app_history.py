@@ -171,11 +171,13 @@ def page_history():
             "연습 횟수": st.column_config.NumberColumn(
                 "연습 횟수",
                 width="small",
+                alignment="left",
             ),
             "평균 점수": st.column_config.NumberColumn(
                 "평균 점수",
                 width="small",
                 format="%.1f점",
+                alignment="left",
             ),
         },
         use_container_width=True,

@@ -192,7 +192,51 @@ def page_result():
             f"{report.get('feedback', '피드백이 없습니다.')}"
         )
 
-    # 오류(오답) 및 오류유형 표시 (수정한 부분)
+        # 오류(오답) 및 오류유형 표시 (상세 오답 노트 테이블 추가)
+    st.divider()
+    st.subheader("📝 상세 오답 노트")
+
+    error_items = report.get("error_items", [])
+
+    if error_items:
+        import pandas as pd
+
+        # 데이터를 보기 좋게 DataFrame으로 변환 후 매핑
+        error_df = pd.DataFrame(error_items)
+
+        # 키 이름이 다를 경우를 대비해 안전하게 리네이밍 (존재하는 컬럼만 반영)
+        rename_map = {}
+        if "type" in error_df.columns:
+            rename_map["type"] = "오류 유형"
+        elif "error_type" in error_df.columns:
+            rename_map["error_type"] = "오류 유형"
+
+        if "ref" in error_df.columns:
+            rename_map["ref"] = "정답 토큰"
+        elif "reference_token" in error_df.columns:
+            rename_map["reference_token"] = "정답 토큰"
+
+        if "hyp" in error_df.columns:
+            rename_map["hyp"] = "인식 토큰"
+        elif "hypothesis_token" in error_df.columns:
+            rename_map["hypothesis_token"] = "인식 토큰"
+
+        if "pos" in error_df.columns:
+            rename_map["pos"] = "위치"
+        elif "position" in error_df.columns:
+            rename_map["position"] = "위치"
+
+        error_df = error_df.rename(columns=rename_map)
+        if "오류 유형" in error_df.columns:
+            error_df["오류 유형"] = error_df["오류 유형"].map({
+                "insertion": "삽입 오류",
+                "deletion": "삭제 오류",
+                "substitution": "대치 오류",
+            }).fillna(error_df["오류 유형"])
+
+        st.dataframe(error_df, use_container_width=True, hide_index=True)
+    else:
+        st.success("틀린 글자 없이 완벽하게 발음하셨습니다! 🎉")
 
     st.divider()
 

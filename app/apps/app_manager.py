@@ -82,7 +82,7 @@ def page_manager():
                     "닉네임": st.column_config.TextColumn("닉네임", width="medium"),
                     "등록일": st.column_config.TextColumn("등록일", width="medium"),
                     "연습 횟수": st.column_config.NumberColumn(
-                        "연습 횟수 (회)", format="%d회", width="medium"
+                        "연습 횟수 (회)", format="%d회", width="medium", alignment="left"
                     ),
                 },
                 use_container_width=True, hide_index=True,
@@ -228,7 +228,22 @@ def page_manager():
 
                     # 전체 문장별 연습 횟수 표
                     with st.expander("전체 문장별 연습 횟수 표 보기"):
-                        st.dataframe(df_sentence, use_container_width=True, hide_index=True)
+                        st.dataframe(
+                            df_sentence,
+                            use_container_width=True,
+                            hide_index=True,
+                            column_config={
+                                "sentence_no": st.column_config.TextColumn(
+                                    "sentence_no",
+                                    alignment="left"
+                                ),
+                                "연습 횟수": st.column_config.NumberColumn(
+                                    "연습 횟수",
+                                    format="%d",
+                                    alignment="left"  # 연습 횟수 열은 왼쪽 정렬 (기본은 오른쪽)
+                                )
+                            }
+                        )
 
         except Exception as e:
             st.error(f"문장 통계를 불러오는 중 오류가 발생했습니다: {e}")
@@ -345,7 +360,7 @@ def page_manager():
                                 column_config={
                                     "카테고리": st.column_config.TextColumn("카테고리", width="medium"),
                                     "연습 횟수": st.column_config.NumberColumn(
-                                        "연습 횟수", format="%d회", width="small"
+                                        "연습 횟수", format="%d회", width="small", alignment="left"
                                     ),
                                     "비율": st.column_config.TextColumn("비율", width="small"),
                                 },
