@@ -4,7 +4,6 @@ import sys
 import glob
 import pandas as pd
 
-# ★ 현재 스크립트 위치(tests/stt_test/)를 기준으로 경로 설정
 current_dir = os.path.dirname(os.path.abspath(__file__))      # tests/stt_test 폴더
 project_root = os.path.dirname(os.path.dirname(current_dir))  # project 루트 폴더 (tests/stt_test -> tests -> project)
 src_core_dir = os.path.join(project_root, "src_core")         # src_core 폴더 (stt.py, core.py 위치)
@@ -21,12 +20,12 @@ except ImportError as e:
 
 
 def main():
-    # 1. 오디오 파일이 들어있는 폴더 경로 지정 (tests/stt_test/stt_test_audio)
+    # 1. 오디오 파일이 들어있는 폴더 경로
     target_dir = os.path.join(current_dir, "stt_test_audio")
     if not os.path.exists(target_dir):
         target_dir = current_dir
 
-    print(f"📂 대상 오디오 디렉토리: {target_dir}")
+    print(f"대상 오디오 디렉토리: {target_dir}")
 
     # 2. 10건의 오디오 파일별 [정답 문장], [난이도], [카테고리] 메타데이터 매핑
     audio_metadata = {
@@ -47,17 +46,17 @@ def main():
     default_category = "미정"
 
     # 3. STT 및 발음 평가 파이프라인 초기화
-    print("🚀 PronunciationPipeline 모델 로딩 중...")
+    print("PronunciationPipeline 모델 로딩 중...")
     pipeline = PronunciationPipeline(model_size="base", device="cpu", compute_type="int8")
 
     # 4. wav 파일 탐색
     audio_files = sorted(glob.glob(os.path.join(target_dir, "*.wav")))
 
     if not audio_files:
-        print(f"⚠️ '{target_dir}' 경로에서 .wav 오디오 파일을 찾지 못했습니다.")
+        print(f"'{target_dir}' 경로에서 .wav 오디오 파일을 찾지 못했습니다.")
         return
 
-    print(f"🎙️ 총 {len(audio_files)}개 음성 파일에 대한 STT 및 평가를 시작합니다.\n")
+    print(f"총 {len(audio_files)}개 음성 파일에 대한 STT 및 평가를 시작합니다.\n")
 
     results = []
     for audio_path in audio_files:
@@ -119,12 +118,12 @@ def main():
         df.to_csv(output_csv, index=False, encoding="utf-8-sig")
 
         print("\n" + "=" * 65)
-        print(f"🎉 처리가 완료되었습니다!")
-        print(f"📄 CSV 저장 경로: {os.path.abspath(output_csv)}")
+        print(f"처리가 완료되었습니다!")
+        print(f"CSV 저장 경로: {os.path.abspath(output_csv)}")
         print("=" * 65)
 
         # 요약 통계 출력
-        print("\n[📊 요약 통계]")
+        print("\n[요약 통계]")
         print(f"- 전체 처리 파일 수: {len(df)}개")
         print(f"- 전체 평균 점수: {df['score'].mean():.2f}점")
         print(f"- 전체 평균 CER(음절 오류율): {df['cer_raw'].mean() * 100:.2f}%")

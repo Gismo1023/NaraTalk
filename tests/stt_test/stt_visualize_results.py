@@ -18,7 +18,7 @@ def main():
         print(f"⚠️ '{csv_path}' 파일을 찾을 수 없습니다. 먼저 stt_test_evaluation.py를 실행하여 CSV를 생성해주세요.")
         return
 
-    print(f"📂 CSV 데이터 로드 중: {csv_path}")
+    print(f"CSV 데이터 로드 중: {csv_path}")
     df = pd.read_csv(csv_path)
 
     # 점수가 비어있는 경우 0점으로 채우기
@@ -121,7 +121,7 @@ def main():
     # 현재 폴더(stt/stt_test/) 내부에 이미지 저장
     output_img = os.path.join(current_dir, "stt_evaluation_dashboard.png")
     plt.savefig(output_img, dpi=300)
-    print(f"🎉 시각화 완료! 이미지 저장 경로: {os.path.abspath(output_img)}")
+    print(f"시각화 완료! 이미지 저장 경로: {os.path.abspath(output_img)}")
 
     plt.show()
 

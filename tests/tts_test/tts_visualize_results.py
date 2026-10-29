@@ -15,7 +15,7 @@ def main():
     csv_path = os.path.join(current_dir, "tts_evaluation_results.csv")
 
     if not os.path.exists(csv_path):
-        print(f"⚠️ '{csv_path}' 파일을 찾을 수 없습니다. 먼저 tts_evaluation_results.py를 실행해주세요.")
+        print(f"'{csv_path}' 파일을 찾을 수 없습니다. 먼저 tts_evaluation_results.py를 실행해주세요.")
         return
 
     print(f"CSV 데이터 로드 중: {csv_path}")

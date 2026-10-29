@@ -1,0 +1,6 @@
+﻿file_name,reference_text,assigned_level,raw_transcript,raw_cer_percent,raw_score,vad_transcript,vad_cer_percent,vad_score,denoise_transcript,denoise_cer_percent,denoise_score,vad_cer_improvement_p,denoise_cer_improvement_p
+stt_test_audio_01.wav,여기 어디에요?,쉬움,여기가 어디예요?,33.3%,66.7,여기가 어디예요?,33.3%,66.7,여기가 어디에요?,16.7%,83.3,0.0%p,16.66%p
+stt_test_audio_02.wav,공항에 어떻게 가요?,보통,공항에 어떻게 가요?,0.0%,100.0,공항에 어떻게 가요?,0.0%,100.0,공항에 어떻게 가려,12.5%,87.5,0.0%p,-12.5%p
+stt_test_audio_03.wav,이 버스가 명동역으로 가나요?,보통,이 버스가 영동력으로 가나요,16.7%,83.3,이 버스가 영동력으로 가나요,16.7%,83.3,이 버스가 명동력으로 가나요,8.3%,91.7,0.0%p,8.34%p
+stt_test_audio_04.wav,체크인 하고 싶어요.,쉬움,체크인 하고 싶어요,0.0%,100.0,체크인 하고 싶어요,0.0%,100.0,체크해 하고 싶어요,12.5%,87.5,0.0%p,-12.5%p
+stt_test_audio_05.wav,부대 시설이 어디에 있나요?,보통,부대시설이 어디에 있나요,0.0%,100.0,부대 시설이 어디에 있나요?,0.0%,100.0,부대 시설이 어디에 있나요,0.0%,100.0,0.0%p,0.0%p
